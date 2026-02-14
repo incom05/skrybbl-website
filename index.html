@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skrybbl — Maths Notebook for Students</title>
+  <meta name="description" content="A free, open-source desktop notebook built for maths, physics, and engineering students. WYSIWYG equations, live computation, graph plotting." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    /* ════════════════════════════════════════════════════════════
+       SKRYBBL LANDING PAGE — v2 REDESIGN
+       Brutalist mono. Show don't tell.
+       ════════════════════════════════════════════════════════════ */
+
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #141414;
+      --text: #d4d4d4;
+      --text-dim: #999999;
+      --text-faint: #5a5a5a;
+      --text-ghost: #2a2a2a;
+      --border: rgba(255,255,255,0.09);
+      --border-strong: rgba(255,255,255,0.16);
+      --mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+    }
+
+    html {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    body { overflow-x: hidden; }
+
+    ::selection {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    a { color: var(--text); text-decoration: none; }
+
+    /* ── Scrollbar ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+
+    /* ════════════════════════════════════════════════════════════
+       NAVIGATION — fixed, hide-on-scroll-down
+       ════════════════════════════════════════════════════════════ */
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 4vw, 60px);
+      height: 54px;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--border);
+    }
+
+    nav.hidden {
+      transform: translateY(-100%);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-links .nav-cta {
+      padding: 7px 16px;
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .nav-links .nav-cta:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       BUTTONS
+       ════════════════════════════════════════════════════════════ */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 12px 28px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: #0a0a0a;
+      border-color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #e0e0e0;
+      border-color: #e0e0e0;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       HERO — two-column with typing demo
+       ════════════════════════════════════════════════════════════ */
+
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 120px clamp(24px, 6vw, 100px) 80px;
+      position: relative;
+      overflow: hidden;
+      gap: 60px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--text-ghost) 1px, transparent 1px),
+        linear-gradient(90deg, var(--text-ghost) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.35;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+    }
+
+    /* Hero watermark logo */
+    .hero-watermark {
+      position: absolute;
+      right: -5%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55vw;
+      max-width: 700px;
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border: 1px solid var(--border-strong);
+      padding: 5px 14px;
+      margin-bottom: 32px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+      color: #fff;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 .hero-thin {
+      font-weight: 300;
+      color: var(--text-dim);
+    }
+
+    .hero-desc {
+      font-size: clamp(13px, 1.3vw, 16px);
+      color: var(--text-dim);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .hero-detail {
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Hero Typing Demo ────────────────────────────────────── */
+
+    .hero-demo {
+      position: relative;
+      z-index: 1;
+    }
+
+    .demo-frame {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      overflow: hidden;
+    }
+
+    .demo-titlebar {
+      height: 32px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 6px;
+    }
+
+    .demo-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--text-faint);
+    }
+
+    .demo-titlebar-text {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-left: 8px;
+    }
+
+    .demo-body {
+      padding: 28px 24px;
+      min-height: 220px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .demo-line {
+      opacity: 0;
+      color: var(--text-dim);
+    }
+
+    .demo-line.demo-math {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      margin: 12px 0;
+      text-align: center;
+      color: #fff;
+    }
+
+    .demo-line.demo-math .katex { font-size: 1.2em; }
+
+    .demo-line.demo-compute {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .demo-line.demo-compute .demo-result {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Typing animation sequence */
+    .demo-line:nth-child(1) {
+      animation: demoFade 0.5s 0.8s forwards;
+    }
+    .demo-line:nth-child(2) {
+      animation: demoFade 0.5s 2.2s forwards;
+    }
+    .demo-line:nth-child(3) {
+      animation: demoFade 0.5s 3.6s forwards;
+    }
+
+    /* Full loop: show for 6s, fade out, restart */
+    .demo-body {
+      animation: demoLoop 12s infinite;
+    }
+
+    @keyframes demoFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes demoLoop {
+      0%, 8% { opacity: 1; }
+      75% { opacity: 1; }
+      83% { opacity: 0; }
+      92% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Re-trigger child animations on loop */
+    .demo-body {
+      animation: demoLoop 12s infinite;
+    }
+
+    .demo-line:nth-child(1) { animation: demoFade 0.5s 0.8s forwards, demoChildReset 12s infinite; }
+    .demo-line:nth-child(2) { animation: demoFade 0.5s 2.2s forwards, demoChildReset 12s infinite; }
+    .demo-line:nth-child(3) { animation: demoFade 0.5s 3.6s forwards, demoChildReset 12s infinite; }
+
+    @keyframes demoChildReset {
+      0%, 6% { opacity: 0; transform: translateY(6px); }
+      14% { opacity: 1; transform: translateY(0); }
+      75% { opacity: 1; transform: translateY(0); }
+      83% { opacity: 0; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(6px); }
+    }
+
+    .demo-line:nth-child(1) { animation: demoChildReset 12s 0s infinite; }
+    .demo-line:nth-child(2) { animation: demoChildReset 12s 1.4s infinite; }
+    .demo-line:nth-child(3) { animation: demoChildReset 12s 2.8s infinite; }
+
+    /* Cursor blink on demo */
+    .demo-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--text-dim);
+      vertical-align: text-bottom;
+      animation: cursorBlink 1s step-end infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes cursorBlink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+
+
+
+    /* ════════════════════════════════════════════════════════════
+       BENTO FEATURE GRID
+       ════════════════════════════════════════════════════════════ */
+
+    .bento {
+      padding: 100px clamp(24px, 6vw, 100px);
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 48px;
+      padding-bottom: 14px;
+      position: relative;
+    }
+
+    .section-label::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 1px;
+      background: var(--border);
+      width: 0;
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+    }
+
+    .section-label.visible::after {
+      width: 100%;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2px;
+    }
+
+    .bento-cell {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      position: relative;
+      padding: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bento-cell-label {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .bento-cell-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-top: auto;
+      line-height: 1.3;
+    }
+
+    .bento-cell-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-top: 6px;
+    }
+
+    /* Cell spans */
+    .bento-math { grid-column: 1 / 8; grid-row: 1 / 3; min-height: 320px; }
+    .bento-compute { grid-column: 8 / 13; grid-row: 1 / 2; }
+    .bento-graph { grid-column: 8 / 13; grid-row: 2 / 3; }
+    .bento-slash { grid-column: 1 / 5; grid-row: 3 / 4; }
+    .bento-themes { grid-column: 5 / 9; grid-row: 3 / 4; }
+    .bento-export { grid-column: 9 / 13; grid-row: 3 / 4; }
+
+    /* ── Math cell ──────────────────────────────────────────── */
+    .bento-math-content {
+      margin-bottom: auto;
+      padding-top: 8px;
+    }
+
+    .bento-math-text {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .bento-math-inline {
+      color: #fff;
+      padding: 1px 4px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .bento-math-inline .katex { font-size: 1em; }
+
+    .bento-math-block {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 18px 24px;
+      text-align: center;
+      color: #fff;
+      margin: 8px 0;
+    }
+
+    .bento-math-block .katex { font-size: 1.3em; }
+
+    /* ── Compute cell ──────────────────────────────────────── */
+    .bento-compute-lines {
+      margin-bottom: auto;
+      padding-top: 8px;
+    }
+
+    .compute-row {
+      font-size: 12px;
+      color: var(--text-dim);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .compute-row:last-child { border-bottom: none; }
+
+    .compute-expr { color: var(--text-dim); }
+    .compute-arrow { color: var(--text-faint); margin: 0 8px; }
+    .compute-result { color: #fff; font-weight: 600; }
+
+    /* Staggered reveal for compute lines */
+    .bento-compute.visible .compute-row {
+      animation: computeReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .bento-compute.visible .compute-row:nth-child(1) { animation-delay: 0.1s; }
+    .bento-compute.visible .compute-row:nth-child(2) { animation-delay: 0.3s; }
+    .bento-compute.visible .compute-row:nth-child(3) { animation-delay: 0.5s; }
+    .bento-compute.visible .compute-row:nth-child(4) { animation-delay: 0.7s; }
+
+    @keyframes computeReveal {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Graph cell ────────────────────────────────────────── */
+    .bento-graph-svg {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 8px;
+    }
+
+    .bento-graph-svg svg { width: 100%; max-width: 280px; }
+
+    /* SVG draw animation */
+    .graph-axis {
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .graph-curve {
+      stroke-dasharray: 500;
+      stroke-dashoffset: 500;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+    }
+
+    .graph-curve-2 {
+      transition-delay: 0.7s;
+    }
+
+    .bento-graph.visible .graph-axis { stroke-dashoffset: 0; }
+    .bento-graph.visible .graph-curve { stroke-dashoffset: 0; }
+
+    /* ── Slash cell ────────────────────────────────────────── */
+    .bento-slash-menu {
+      padding-top: 8px;
+      margin-bottom: auto;
+    }
+
+    .slash-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 8px;
+      margin: 2px 0;
+      font-size: 12px;
+      color: var(--text-dim);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .slash-item.hl {
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+    }
+
+    .slash-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-faint);
+      flex-shrink: 0;
+    }
+
+    .slash-item.hl .slash-icon {
+      color: var(--text-dim);
+      border-color: var(--border-strong);
+    }
+
+    /* ── Themes cell (interactive) ─────────────────────────── */
+    .bento-themes-inner {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .theme-swatches {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding-top: 8px;
+      margin-bottom: auto;
+    }
+
+    .swatch {
+      height: 36px;
+      border: 1px solid var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .swatch:hover {
+      border-color: var(--border-strong);
+      transform: scale(1.05);
+    }
+
+    .swatch-label {
+      position: absolute;
+      bottom: 3px;
+      left: 5px;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Export cell ────────────────────────────────────────── */
+    .bento-export-content {
+      padding-top: 8px;
+      margin-bottom: auto;
+    }
+
+    .export-code {
+      font-size: 10px;
+      color: var(--text-dim);
+      line-height: 1.9;
+    }
+
+    .export-code code {
+      display: block;
+      font-family: var(--mono);
+    }
+
+    .export-hl { color: #fff; }
+
+
+    /* ════════════════════════════════════════════════════════════
+       APP SHOWCASE — interactive sidebar
+       ════════════════════════════════════════════════════════════ */
+
+    .showcase {
+      padding: 80px clamp(24px, 6vw, 100px);
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-frame {
+      width: 100%;
+      max-width: 920px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .app-titlebar {
+      height: 36px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+    }
+
+    .app-titlebar-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--text-faint);
+    }
+
+    .app-titlebar-text {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-left: 8px;
+    }
+
+    .app-body {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      min-height: 360px;
+    }
+
+    .app-sidebar {
+      background: var(--bg-raised);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+
+    .app-sidebar-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      padding: 6px 14px;
+    }
+
+    .app-sidebar-item {
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .app-sidebar-item:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .app-sidebar-item.active {
+      color: #fff;
+      background: rgba(255,255,255,0.04);
+      border-left: 2px solid #fff;
+      padding-left: 12px;
+    }
+
+    .app-editor {
+      padding: 32px 40px;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    .app-editor-content {
+      transition: opacity 0.25s ease;
+    }
+
+    .app-editor-content.fading {
+      opacity: 0;
+    }
+
+    .app-editor h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .app-editor p {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .app-editor .math-block {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      margin: 16px 0;
+      text-align: center;
+      color: #fff;
+    }
+
+    .app-editor .math-block .katex { font-size: 1.25em; }
+
+    .app-editor .inline-math {
+      color: #fff;
+      padding: 1px 4px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .app-editor .inline-math .katex { font-size: 1em; }
+
+    .app-editor .compute-line {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .app-editor .compute-line .res {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .app-statusbar {
+      height: 26px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 16px;
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 0.03em;
+    }
+
+
+
+
+    /* ════════════════════════════════════════════════════════════
+       TRUST STRIP
+       ════════════════════════════════════════════════════════════ */
+
+    .trust {
+      display: flex;
+      justify-content: center;
+      gap: clamp(24px, 5vw, 64px);
+      padding: 20px clamp(24px, 6vw, 100px);
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       CTA
+       ════════════════════════════════════════════════════════════ */
+
+    .cta {
+      padding: 120px clamp(24px, 6vw, 100px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--text-ghost) 1px, transparent 1px),
+        linear-gradient(90deg, var(--text-ghost) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.2;
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 10%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 10%, transparent 70%);
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta h2 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 420px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .cta-detail {
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════════════════════════ */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px clamp(24px, 6vw, 100px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.02em;
+    }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--text); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       SCROLL ANIMATIONS
+       ════════════════════════════════════════════════════════════ */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .app-frame.reveal {
+      transform: translateY(40px);
+    }
+
+    .app-frame.reveal.visible {
+      transform: translateY(0);
+    }
+
+    /* CTA fade */
+    .cta .reveal-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cta.visible .reveal-up {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cta.visible .reveal-up:nth-child(2) { transition-delay: 0.1s; }
+    .cta.visible .reveal-up:nth-child(3) { transition-delay: 0.2s; }
+    .cta.visible .reveal-up:nth-child(4) { transition-delay: 0.3s; }
+
+    /* Hero entrance */
+    .hero-content > * {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+    .hero-content > *:nth-child(3) { animation-delay: 0.35s; }
+    .hero-content > *:nth-child(4) { animation-delay: 0.5s; }
+    .hero-content > *:nth-child(5) { animation-delay: 0.6s; }
+
+    .hero-demo {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+    }
+
+    @keyframes heroIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+    /* ════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════════════ */
+
+    @media (max-width: 1024px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .bento-math { grid-column: 1 / -1; grid-row: auto; min-height: 240px; }
+      .bento-compute { grid-column: 1 / 2; grid-row: auto; }
+      .bento-graph { grid-column: 2 / 3; grid-row: auto; }
+      .bento-slash { grid-column: 1 / 2; grid-row: auto; }
+      .bento-themes { grid-column: 2 / 3; grid-row: auto; }
+      .bento-export { grid-column: 1 / -1; grid-row: auto; }
+
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding-top: 100px;
+      }
+
+      .hero-demo {
+        max-width: 500px;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-math,
+      .bento-compute,
+      .bento-graph,
+      .bento-slash,
+      .bento-themes,
+      .bento-export {
+        grid-column: 1 / -1;
+        grid-row: auto;
+      }
+
+      .bento-math { min-height: 200px; }
+
+      .app-body { grid-template-columns: 1fr; }
+      .app-sidebar { display: none; }
+
+      .nav-links .nav-link-text { display: none; }
+
+      .trust {
+        gap: 16px;
+      }
+
+      .trust-item {
+        font-size: 9px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 11px;
+      }
+
+      .trust {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <svg width="20" height="20" viewBox="0 0 500 500" fill="none">
+        <g transform="matrix(2.51796,0,0,2.51796,-1563.66,-565.099)">
+          <path d="M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z" fill="#d4d4d4"/>
+        </g>
+      </svg>
+      Skrybbl
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link-text">Features</a>
+      <a href="#preview" class="nav-link-text">Preview</a>
+      <!-- TODO: Replace with actual GitHub repo URL -->
+      <a href="https://github.com/username/skrybbl" target="_blank" class="nav-link-text">GitHub</a>
+      <a href="#download" class="nav-cta">Download</a>
+    </div>
+  </nav>
+
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Free / Open Source / Windows</div>
+      <h1>
+        Write maths.<br>
+        <span class="hero-thin">Not markup.</span>
+      </h1>
+      <p class="hero-desc">
+        A desktop notebook for students who think in equations. WYSIWYG maths,
+        live computation, and graph plotting &mdash; no compile step, no preview pane.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/username/skrybbl/releases/latest/download/Skrybbl-Setup.exe" class="btn btn-primary" data-download>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download for Windows
+        </a>
+        <a href="https://github.com/username/skrybbl" target="_blank" class="btn btn-secondary">View on GitHub</a>
+      </div>
+      <div class="hero-detail">Windows 10+ / ~85 MB / No sign-in / No telemetry</div>
+    </div>
+
+    <div class="hero-demo">
+      <div class="demo-frame">
+        <div class="demo-titlebar">
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+          <div class="demo-titlebar-text">Physics I.skrybbl</div>
+        </div>
+        <div class="demo-body">
+          <div class="demo-line" style="color:var(--text-dim)">
+            The displacement is given by<span class="demo-cursor"></span>
+          </div>
+          <div class="demo-line demo-math">
+            \[\displaystyle s = ut + \tfrac{1}{2}at^2\]
+          </div>
+          <div class="demo-line demo-compute">
+            = 0.5 * 9.81 * 3^2 <span style="color:var(--text-faint)">&rarr;</span> <span class="demo-result">44.15 m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- ═══ BENTO FEATURE GRID ═══ -->
+  <section class="bento" id="features">
+    <div class="section-label reveal">What you get</div>
+
+    <div class="bento-grid">
+
+      <!-- Maths Editing — large cell -->
+      <div class="bento-cell bento-math reveal">
+        <span class="bento-cell-label">Editor</span>
+        <div class="bento-math-content">
+          <div class="bento-math-text">
+            The solution to the quadratic equation
+            <span class="bento-math-inline">\(ax^2 + bx + c = 0\)</span> is:
+          </div>
+          <div class="bento-math-block">
+            \[\displaystyle x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]
+          </div>
+          <div class="bento-math-text" style="margin-top:12px">
+            For <span class="bento-math-inline">\(a = 1,\; b = -5,\; c = 6\)</span>, the roots are
+            <span class="bento-math-inline">\(x = 2\)</span> and <span class="bento-math-inline">\(x = 3\)</span>.
+          </div>
+        </div>
+        <div class="bento-cell-title">Real maths editing.</div>
+        <div class="bento-cell-desc">WYSIWYG equations with MathLive. Inline or block. No compilation.</div>
+      </div>
+
+      <!-- Live Computation -->
+      <div class="bento-cell bento-compute reveal">
+        <span class="bento-cell-label">Compute</span>
+        <div class="bento-compute-lines">
+          <div class="compute-row">
+            <span class="compute-expr">= 3 * sin(pi/6) + 1</span>
+            <span><span class="compute-arrow">&rarr;</span><span class="compute-result">2.5</span></span>
+          </div>
+          <div class="compute-row">
+            <span class="compute-expr">= sqrt(144) / 3</span>
+            <span><span class="compute-arrow">&rarr;</span><span class="compute-result">4</span></span>
+          </div>
+          <div class="compute-row">
+            <span class="compute-expr">= 9.81 * 2.5^2 / 2</span>
+            <span><span class="compute-arrow">&rarr;</span><span class="compute-result">30.66</span></span>
+          </div>
+          <div class="compute-row">
+            <span class="compute-expr">= det([1,2;3,4])</span>
+            <span><span class="compute-arrow">&rarr;</span><span class="compute-result">-2</span></span>
+          </div>
+        </div>
+        <div class="bento-cell-title">Live computation.</div>
+        <div class="bento-cell-desc">Type = expression, get instant results via mathjs.</div>
+      </div>
+
+      <!-- Graph Plotting -->
+      <div class="bento-cell bento-graph reveal">
+        <span class="bento-cell-label">Graph</span>
+        <div class="bento-graph-svg">
+          <svg viewBox="0 0 260 160" fill="none">
+            <!-- axes -->
+            <line class="graph-axis" x1="30" y1="130" x2="250" y2="130" stroke="#444" stroke-width="1"/>
+            <line class="graph-axis" x1="30" y1="10" x2="30" y2="130" stroke="#444" stroke-width="1"/>
+            <!-- grid -->
+            <line x1="30" y1="50" x2="250" y2="50" stroke="#1a1a1a" stroke-width="0.5"/>
+            <line x1="30" y1="90" x2="250" y2="90" stroke="#1a1a1a" stroke-width="0.5"/>
+            <line x1="100" y1="10" x2="100" y2="130" stroke="#1a1a1a" stroke-width="0.5"/>
+            <line x1="170" y1="10" x2="170" y2="130" stroke="#1a1a1a" stroke-width="0.5"/>
+            <!-- sin curve -->
+            <path class="graph-curve" d="M30,70 C55,20 80,20 105,70 C130,120 155,120 180,70 C205,20 230,20 250,55" stroke="#999" stroke-width="1.5" fill="none"/>
+            <!-- cos curve -->
+            <path class="graph-curve graph-curve-2" d="M30,25 C55,70 80,120 105,120 C130,120 155,70 180,25 C205,-15 230,30 250,70" stroke="#555" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+            <!-- labels -->
+            <text x="252" y="58" fill="#777" font-family="JetBrains Mono,monospace" font-size="8">sin(x)</text>
+            <text x="252" y="74" fill="#555" font-family="JetBrains Mono,monospace" font-size="8">cos(x)</text>
+          </svg>
+        </div>
+        <div class="bento-cell-title">Graph plotting.</div>
+        <div class="bento-cell-desc">Plot functions inline with function-plot + d3.</div>
+      </div>
+
+      <!-- Slash Commands -->
+      <div class="bento-cell bento-slash reveal">
+        <span class="bento-cell-label">/ Menu</span>
+        <div class="bento-slash-menu">
+          <div class="slash-item"><span class="slash-icon">H1</span> Heading 1</div>
+          <div class="slash-item hl"><span class="slash-icon">&Sigma;</span> Block Equation</div>
+          <div class="slash-item"><span class="slash-icon">=</span> Compute Field</div>
+          <div class="slash-item"><span class="slash-icon">~</span> Graph Plot</div>
+          <div class="slash-item"><span class="slash-icon">&lt;&gt;</span> Code Block</div>
+        </div>
+        <div class="bento-cell-title">Slash commands.</div>
+        <div class="bento-cell-desc">Type / to insert any block type.</div>
+      </div>
+
+      <!-- Themes (interactive) -->
+      <div class="bento-cell bento-themes reveal" id="theme-cell">
+        <span class="bento-cell-label">Themes</span>
+        <div class="theme-swatches">
+          <div class="swatch" style="background:#0a0a0a" data-bg="#0a0a0a" data-text="#d4d4d4"><span class="swatch-label" style="color:#999">Dark</span></div>
+          <div class="swatch" style="background:#fafafa" data-bg="#fafafa" data-text="#333"><span class="swatch-label" style="color:#555">Light</span></div>
+          <div class="swatch" style="background:#0b0d14" data-bg="#0b0d14" data-text="#a0a8c0"><span class="swatch-label" style="color:#8890a8">Midnight</span></div>
+          <div class="swatch" style="background:#f5f0e8" data-bg="#f5f0e8" data-text="#5a5040"><span class="swatch-label" style="color:#6a5f4a">Paper</span></div>
+          <div class="swatch" style="background:#2e3440" data-bg="#2e3440" data-text="#d8dee9"><span class="swatch-label" style="color:#b0b8c8">Nord</span></div>
+          <div class="swatch" style="background:#080c08" data-bg="#080c08" data-text="#8fac8f"><span class="swatch-label" style="color:#6a9a6a">Green</span></div>
+        </div>
+        <div class="bento-cell-title" id="theme-title">Six themes.</div>
+        <div class="bento-cell-desc" id="theme-desc">Zero accent colours. Click a swatch.</div>
+      </div>
+
+      <!-- Export -->
+      <div class="bento-cell bento-export reveal">
+        <span class="bento-cell-label">.tex</span>
+        <div class="bento-export-content">
+          <div class="export-code">
+            <code>\documentclass{article}</code>
+            <code>\usepackage{amsmath}</code>
+            <code>&nbsp;</code>
+            <code>\begin{document}</code>
+            <code>&nbsp; \begin{equation}</code>
+            <code>&nbsp;&nbsp;&nbsp; <span class="export-hl">x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</span></code>
+            <code>&nbsp; \end{equation}</code>
+            <code>\end{document}</code>
+          </div>
+        </div>
+        <div class="bento-cell-title">Export to LaTeX & Markdown.</div>
+        <div class="bento-cell-desc">One-click export handles equations, compute fields, and graphs.</div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══ APP SHOWCASE — interactive ═══ -->
+  <section class="showcase" id="preview">
+    <div class="app-frame reveal">
+      <div class="app-titlebar">
+        <div class="app-titlebar-dot"></div>
+        <div class="app-titlebar-dot"></div>
+        <div class="app-titlebar-dot"></div>
+        <div class="app-titlebar-text">Mechanics Notes.skrybbl</div>
+      </div>
+      <div class="app-body">
+        <div class="app-sidebar">
+          <div class="app-sidebar-label">Pages</div>
+          <div class="app-sidebar-item active" data-page="0">Kinematics</div>
+          <div class="app-sidebar-item" data-page="1">Newton's Laws</div>
+          <div class="app-sidebar-item" data-page="2">Energy</div>
+          <div class="app-sidebar-item" data-page="3">Momentum</div>
+        </div>
+        <div class="app-editor">
+          <div class="app-editor-content" id="app-editor-content">
+            <!-- Content injected by JS -->
+          </div>
+        </div>
+      </div>
+      <div class="app-statusbar">
+        <span>&#9679; Saved</span>
+        <span id="statusbar-words">142 words</span>
+        <span id="statusbar-page">Page 1 of 4</span>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- ═══ TRUST STRIP ═══ -->
+  <div class="trust">
+    <span class="trust-item">Open Source</span>
+    <span class="trust-item">No Account Required</span>
+    <span class="trust-item">No Telemetry</span>
+    <span class="trust-item">Works Offline</span>
+  </div>
+
+
+  <!-- ═══ CTA ═══ -->
+  <section class="cta reveal" id="download">
+    <div class="cta-inner">
+      <h2 class="reveal-up">Start writing.</h2>
+      <p class="reveal-up">Free. Open source. No sign-in. No internet required.</p>
+      <div class="cta-actions reveal-up">
+        <a href="https://github.com/username/skrybbl/releases/latest/download/Skrybbl-Setup.exe" class="btn btn-primary" data-download>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download for Windows
+        </a>
+        <a href="https://github.com/username/skrybbl" target="_blank" class="btn btn-secondary">View on GitHub</a>
+      </div>
+      <div class="cta-detail reveal-up">Windows 10+ / v1.0.0 / MIT License</div>
+    </div>
+  </section>
+
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <span>Skrybbl &mdash; 2026. Open source under MIT.</span>
+    <div class="footer-links">
+      <a href="https://github.com/username/skrybbl" target="_blank">GitHub</a>
+      <a href="https://github.com/username/skrybbl/releases" target="_blank">Releases</a>
+      <a href="https://github.com/username/skrybbl/issues" target="_blank">Report Issue</a>
+    </div>
+  </footer>
+
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+  // ── 1. Scroll Reveal Observer ────────────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── 2. Nav Hide-on-scroll-down, Show-on-scroll-up ────────
+  (function() {
+    const nav = document.getElementById('navbar');
+    let lastY = 0;
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          if (y > 80) {
+            nav.classList.add('scrolled');
+            if (y > lastY && y > 200) {
+              nav.classList.add('hidden');
+            } else {
+              nav.classList.remove('hidden');
+            }
+          } else {
+            nav.classList.remove('scrolled', 'hidden');
+          }
+          lastY = y;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  })();
+
+  // ── 3. App Showcase — Sidebar Page Switching ─────────────
+  (function() {
+    const pages = [
+      {
+        title: 'Kinematics',
+        words: 142,
+        html: '<h2>Kinematics</h2>' +
+          '<p>For constant acceleration, the position as a function of time is given by:</p>' +
+          '<div class="math-block">\\[x(t) = x_0 + v_0 t + \\tfrac{1}{2}at^2\\]</div>' +
+          '<p>where <span class="inline-math">\\(v_0\\)</span> is the initial velocity and <span class="inline-math">\\(a\\)</span> is the constant acceleration.</p>' +
+          '<p style="margin-top:16px">Quick calculations:</p>' +
+          '<p class="compute-line">= 0.5 * 9.81 * 3^2 \u2192 <span class="res">44.145 m</span></p>' +
+          '<p class="compute-line">= sqrt(2 * 9.81 * 20) \u2192 <span class="res">19.81 m/s</span></p>'
+      },
+      {
+        title: "Newton's Laws",
+        words: 98,
+        html: '<h2>Newton\'s Laws</h2>' +
+          '<p>Newton\'s second law relates force, mass, and acceleration:</p>' +
+          '<div class="math-block">\\[F = ma\\]</div>' +
+          '<p>For a system of forces, the net force is:</p>' +
+          '<div class="math-block">\\[\\sum F = m \\cdot a\\]</div>' +
+          '<p class="compute-line">= 75 * 9.81 \u2192 <span class="res">735.75 N</span></p>'
+      },
+      {
+        title: 'Energy',
+        words: 115,
+        html: '<h2>Energy</h2>' +
+          '<p>The work-energy theorem states that net work equals change in kinetic energy:</p>' +
+          '<div class="math-block">\\[W = \\Delta KE = \\tfrac{1}{2}mv^2 - \\tfrac{1}{2}mv_0^2\\]</div>' +
+          '<p>Gravitational potential energy near Earth\'s surface:</p>' +
+          '<div class="math-block">\\[U = mgh\\]</div>' +
+          '<p class="compute-line">= 0.5 * 2 * 15^2 \u2192 <span class="res">225 J</span></p>' +
+          '<p class="compute-line">= 2 * 9.81 * 10 \u2192 <span class="res">196.2 J</span></p>'
+      },
+      {
+        title: 'Momentum',
+        words: 88,
+        html: '<h2>Momentum</h2>' +
+          '<p>Linear momentum is defined as mass times velocity:</p>' +
+          '<div class="math-block">\\[p = mv\\]</div>' +
+          '<p>Conservation of momentum in collisions:</p>' +
+          '<div class="math-block">\\[m_1 v_1 + m_2 v_2 = m_1 v_1\' + m_2 v_2\'\\]</div>' +
+          '<p class="compute-line">= 5 * 3 + 2 * (-1) \u2192 <span class="res">13 kg\u00B7m/s</span></p>'
+      }
+    ];
+
+    const editorContent = document.getElementById('app-editor-content');
+    const statusWords = document.getElementById('statusbar-words');
+    const statusPage = document.getElementById('statusbar-page');
+    const sidebarItems = document.querySelectorAll('.app-sidebar-item[data-page]');
+
+    // Set initial content
+    editorContent.innerHTML = pages[0].html;
+
+    sidebarItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const idx = parseInt(item.dataset.page);
+        if (item.classList.contains('active')) return;
+
+        sidebarItems.forEach(s => s.classList.remove('active'));
+        item.classList.add('active');
+
+        // Fade out
+        editorContent.classList.add('fading');
+        setTimeout(() => {
+          editorContent.innerHTML = pages[idx].html;
+          statusWords.textContent = pages[idx].words + ' words';
+          statusPage.textContent = 'Page ' + (idx + 1) + ' of 4';
+          editorContent.classList.remove('fading');
+          if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(editorContent, {
+              delimiters: [
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false}
+              ],
+              throwOnError: false
+            });
+          }
+        }, 250);
+      });
+    });
+  })();
+
+  // ── 4. Theme Swatch Interaction ──────────────────────────
+  (function() {
+    const cell = document.getElementById('theme-cell');
+    const title = document.getElementById('theme-title');
+    const desc = document.getElementById('theme-desc');
+    if (!cell) return;
+
+    cell.querySelectorAll('.swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        const bg = swatch.dataset.bg;
+        const text = swatch.dataset.text;
+        const name = swatch.querySelector('.swatch-label').textContent;
+        cell.style.background = bg;
+        cell.style.borderColor = 'rgba(255,255,255,0.12)';
+        title.style.color = text;
+        desc.style.color = text;
+        desc.textContent = name + ' theme applied.';
+      });
+    });
+  })();
+
+  // ── 5. KaTeX Auto-Render ────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof renderMathInElement !== 'undefined') {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+
+</script>
+
+</body>
+</html>
