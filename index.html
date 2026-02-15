@@ -6,7 +6,7 @@
   <title>Skrybbl — Maths Notebook for Students</title>
   <meta name="description" content="A free, open-source desktop notebook built for maths, physics, and engineering students. WYSIWYG equations, live computation, graph plotting." />
   <meta name="theme-color" content="#0a0a0a" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='none'%3E%3Cg transform='matrix(2.51796,0,0,2.51796,-1563.66,-565.099)'%3E%3Cpath d='M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z' fill='%23d4d4d4'/%3E%3C/g%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
@@ -304,11 +304,21 @@
       min-height: 220px;
       font-size: 14px;
       line-height: 1.8;
+      transition: opacity 0.5s ease;
     }
 
+    .demo-body.fading { opacity: 0; }
+
     .demo-line {
-      opacity: 0;
       color: var(--text-dim);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.45s cubic-bezier(0.16,1,0.3,1), transform 0.45s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .demo-line.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .demo-line.demo-math {
@@ -331,56 +341,6 @@
       color: #fff;
       font-weight: 600;
     }
-
-    /* Typing animation sequence */
-    .demo-line:nth-child(1) {
-      animation: demoFade 0.5s 0.8s forwards;
-    }
-    .demo-line:nth-child(2) {
-      animation: demoFade 0.5s 2.2s forwards;
-    }
-    .demo-line:nth-child(3) {
-      animation: demoFade 0.5s 3.6s forwards;
-    }
-
-    /* Full loop: show for 6s, fade out, restart */
-    .demo-body {
-      animation: demoLoop 12s infinite;
-    }
-
-    @keyframes demoFade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes demoLoop {
-      0%, 8% { opacity: 1; }
-      75% { opacity: 1; }
-      83% { opacity: 0; }
-      92% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    /* Re-trigger child animations on loop */
-    .demo-body {
-      animation: demoLoop 12s infinite;
-    }
-
-    .demo-line:nth-child(1) { animation: demoFade 0.5s 0.8s forwards, demoChildReset 12s infinite; }
-    .demo-line:nth-child(2) { animation: demoFade 0.5s 2.2s forwards, demoChildReset 12s infinite; }
-    .demo-line:nth-child(3) { animation: demoFade 0.5s 3.6s forwards, demoChildReset 12s infinite; }
-
-    @keyframes demoChildReset {
-      0%, 6% { opacity: 0; transform: translateY(6px); }
-      14% { opacity: 1; transform: translateY(0); }
-      75% { opacity: 1; transform: translateY(0); }
-      83% { opacity: 0; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(6px); }
-    }
-
-    .demo-line:nth-child(1) { animation: demoChildReset 12s 0s infinite; }
-    .demo-line:nth-child(2) { animation: demoChildReset 12s 1.4s infinite; }
-    .demo-line:nth-child(3) { animation: demoChildReset 12s 2.8s infinite; }
 
     /* Cursor blink on demo */
     .demo-cursor {
@@ -406,8 +366,8 @@
        ════════════════════════════════════════════════════════════ */
 
     .bento {
-      padding: 100px clamp(24px, 6vw, 100px);
-      max-width: 1140px;
+      padding: 120px clamp(24px, 6vw, 100px) 100px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
@@ -417,7 +377,7 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-faint);
-      margin-bottom: 48px;
+      margin-bottom: 40px;
       padding-bottom: 14px;
       position: relative;
     }
@@ -438,54 +398,68 @@
 
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 2px;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 4px;
     }
 
     .bento-cell {
       background: var(--bg-card);
       border: 1px solid var(--border);
       position: relative;
-      padding: 24px;
+      padding: 28px 28px 24px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .bento-cell:hover {
+      border-color: rgba(255,255,255,0.14);
+      background: #161616;
     }
 
     .bento-cell-label {
-      position: absolute;
-      top: 10px;
-      right: 12px;
       font-size: 9px;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-faint);
+      margin-bottom: 16px;
     }
 
     .bento-cell-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
       color: #fff;
       margin-top: auto;
+      padding-top: 20px;
       line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bento-cell-title svg {
+      flex-shrink: 0;
+      opacity: 0.5;
     }
 
     .bento-cell-desc {
       font-size: 11px;
       color: var(--text-dim);
       line-height: 1.6;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
-    /* Cell spans */
-    .bento-math { grid-column: 1 / 8; grid-row: 1 / 3; min-height: 320px; }
-    .bento-compute { grid-column: 8 / 13; grid-row: 1 / 2; }
-    .bento-graph { grid-column: 8 / 13; grid-row: 2 / 3; }
-    .bento-slash { grid-column: 1 / 5; grid-row: 3 / 4; }
-    .bento-themes { grid-column: 5 / 9; grid-row: 3 / 4; }
-    .bento-export { grid-column: 9 / 13; grid-row: 3 / 4; }
+    /* Cell spans — math cell spans full width on first row */
+    .bento-math { grid-column: 1 / -1; min-height: 280px; }
+    .bento-compute { }
+    .bento-graph { }
+    .bento-slash { }
+    .bento-themes { }
+    .bento-export { grid-column: 1 / -1; }
 
     /* ── Math cell ──────────────────────────────────────────── */
     .bento-math-content {
@@ -509,15 +483,16 @@
     .bento-math-inline .katex { font-size: 1em; }
 
     .bento-math-block {
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.025);
       border: 1px solid var(--border);
-      padding: 18px 24px;
+      padding: 22px 28px;
       text-align: center;
       color: #fff;
-      margin: 8px 0;
+      margin: 10px 0;
+      box-shadow: 0 0 40px rgba(255,255,255,0.015);
     }
 
-    .bento-math-block .katex { font-size: 1.3em; }
+    .bento-math-block .katex { font-size: 1.35em; }
 
     /* ── Compute cell ──────────────────────────────────────── */
     .bento-compute-lines {
@@ -528,14 +503,17 @@
     .compute-row {
       font-size: 12px;
       color: var(--text-dim);
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 7px 10px;
+      border-left: 2px solid rgba(255,255,255,0.06);
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: rgba(255,255,255,0.015);
+      transition: border-color 0.2s;
     }
 
-    .compute-row:last-child { border-bottom: none; }
+    .compute-row:hover { border-left-color: rgba(255,255,255,0.2); }
 
     .compute-expr { color: var(--text-dim); }
     .compute-arrow { color: var(--text-faint); margin: 0 8px; }
@@ -598,16 +576,18 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 5px 8px;
+      padding: 6px 10px;
       margin: 2px 0;
       font-size: 12px;
       color: var(--text-dim);
       transition: background 0.15s, color 0.15s;
+      border-left: 2px solid transparent;
     }
 
     .slash-item.hl {
       background: rgba(255,255,255,0.04);
       color: #fff;
+      border-left-color: #fff;
     }
 
     .slash-icon {
@@ -643,16 +623,17 @@
     }
 
     .swatch {
-      height: 36px;
+      height: 40px;
       border: 1px solid var(--border);
       position: relative;
       cursor: pointer;
-      transition: border-color 0.15s, transform 0.15s;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
 
     .swatch:hover {
       border-color: var(--border-strong);
-      transform: scale(1.05);
+      transform: scale(1.06);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
 
     .swatch-label {
@@ -671,18 +652,68 @@
       margin-bottom: auto;
     }
 
-    .export-code {
+    .export-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .export-source {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .export-source .katex { font-size: 1.1em; }
+
+    .export-arrow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-faint);
       font-size: 10px;
-      color: var(--text-dim);
-      line-height: 1.9;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .export-code code {
-      display: block;
-      font-family: var(--mono);
+    .export-arrow-row svg { opacity: 0.4; }
+
+    .export-formats {
+      display: flex;
+      gap: 6px;
     }
 
-    .export-hl { color: #fff; }
+    .export-format-pill {
+      flex: 1;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .export-format-pill:hover {
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .export-format-ext {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .export-format-name {
+      font-size: 9px;
+      color: var(--text-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
 
 
     /* ════════════════════════════════════════════════════════════
@@ -1115,7 +1146,7 @@
     <div class="nav-links">
       <a href="#features" class="nav-link-text">Features</a>
       <a href="#preview" class="nav-link-text">Preview</a>
-      <!-- TODO: Replace with actual GitHub repo URL -->
+      <a href="docs.html" class="nav-link-text">Docs</a>
       <a href="https://github.com/username/skrybbl" target="_blank" class="nav-link-text">GitHub</a>
       <a href="#download" class="nav-cta">Download</a>
     </div>
@@ -1124,6 +1155,11 @@
 
   <!-- ═══ HERO ═══ -->
   <section class="hero">
+    <svg class="hero-watermark" viewBox="0 0 500 500" fill="none">
+      <g transform="matrix(2.51796,0,0,2.51796,-1563.66,-565.099)">
+        <path d="M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z" fill="#d4d4d4"/>
+      </g>
+    </svg>
     <div class="hero-content">
       <div class="hero-badge">Free / Open Source / Windows</div>
       <h1>
@@ -1150,18 +1186,10 @@
           <div class="demo-dot"></div>
           <div class="demo-dot"></div>
           <div class="demo-dot"></div>
-          <div class="demo-titlebar-text">Physics I.skrybbl</div>
+          <div class="demo-titlebar-text" id="demo-title">Physics I.skrybbl</div>
         </div>
-        <div class="demo-body">
-          <div class="demo-line" style="color:var(--text-dim)">
-            The displacement is given by<span class="demo-cursor"></span>
-          </div>
-          <div class="demo-line demo-math">
-            \[\displaystyle s = ut + \tfrac{1}{2}at^2\]
-          </div>
-          <div class="demo-line demo-compute">
-            = 0.5 * 9.81 * 3^2 <span style="color:var(--text-faint)">&rarr;</span> <span class="demo-result">44.15 m</span>
-          </div>
+        <div class="demo-body" id="demo-body">
+          <!-- Content injected by cycling JS -->
         </div>
       </div>
     </div>
@@ -1181,18 +1209,18 @@
         <span class="bento-cell-label">Editor</span>
         <div class="bento-math-content">
           <div class="bento-math-text">
-            The solution to the quadratic equation
-            <span class="bento-math-inline">\(ax^2 + bx + c = 0\)</span> is:
+            The Fourier transform of a function <span class="bento-math-inline">\(f(t)\)</span> is defined as:
           </div>
           <div class="bento-math-block">
-            \[\displaystyle x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]
+            \[\displaystyle \hat{f}(\omega) = \int_{-\infty}^{\infty} f(t)\, e^{-i\omega t}\, \mathrm{d}t\]
           </div>
           <div class="bento-math-text" style="margin-top:12px">
-            For <span class="bento-math-inline">\(a = 1,\; b = -5,\; c = 6\)</span>, the roots are
-            <span class="bento-math-inline">\(x = 2\)</span> and <span class="bento-math-inline">\(x = 3\)</span>.
+            Maxwell's equations in differential form unify
+            <span class="bento-math-inline">\(\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}\)</span> and
+            <span class="bento-math-inline">\(\nabla \times \mathbf{B} = \mu_0 \mathbf{J} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}\)</span>.
           </div>
         </div>
-        <div class="bento-cell-title">Real maths editing.</div>
+        <div class="bento-cell-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.121 2.121 0 00-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg>Real maths editing.</div>
         <div class="bento-cell-desc">WYSIWYG equations with MathLive. Inline or block. No compilation.</div>
       </div>
 
@@ -1217,7 +1245,7 @@
             <span><span class="compute-arrow">&rarr;</span><span class="compute-result">-2</span></span>
           </div>
         </div>
-        <div class="bento-cell-title">Live computation.</div>
+        <div class="bento-cell-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>Live computation.</div>
         <div class="bento-cell-desc">Type = expression, get instant results via mathjs.</div>
       </div>
 
@@ -1234,16 +1262,14 @@
             <line x1="30" y1="90" x2="250" y2="90" stroke="#1a1a1a" stroke-width="0.5"/>
             <line x1="100" y1="10" x2="100" y2="130" stroke="#1a1a1a" stroke-width="0.5"/>
             <line x1="170" y1="10" x2="170" y2="130" stroke="#1a1a1a" stroke-width="0.5"/>
-            <!-- sin curve -->
-            <path class="graph-curve" d="M30,70 C55,20 80,20 105,70 C130,120 155,120 180,70 C205,20 230,20 250,55" stroke="#999" stroke-width="1.5" fill="none"/>
-            <!-- cos curve -->
-            <path class="graph-curve graph-curve-2" d="M30,25 C55,70 80,120 105,120 C130,120 155,70 180,25 C205,-15 230,30 250,70" stroke="#555" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
-            <!-- labels -->
-            <text x="252" y="58" fill="#777" font-family="JetBrains Mono,monospace" font-size="8">sin(x)</text>
-            <text x="252" y="74" fill="#555" font-family="JetBrains Mono,monospace" font-size="8">cos(x)</text>
+            <!-- cos curve (behind) -->
+            <path class="graph-curve graph-curve-2" d="M30,25 C55,70 80,120 105,120 C130,120 155,70 180,25 C205,-15 230,30 250,70" stroke="#444" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+            <!-- sin curve (front) -->
+            <path class="graph-curve" d="M30,70 C55,20 80,20 105,70 C130,120 155,120 180,70 C205,20 230,20 250,55" stroke="#aaa" stroke-width="1.5" fill="none"/>
+            <!-- labels removed for cleaner look -->
           </svg>
         </div>
-        <div class="bento-cell-title">Graph plotting.</div>
+        <div class="bento-cell-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Graph plotting.</div>
         <div class="bento-cell-desc">Plot functions inline with function-plot + d3.</div>
       </div>
 
@@ -1252,12 +1278,12 @@
         <span class="bento-cell-label">/ Menu</span>
         <div class="bento-slash-menu">
           <div class="slash-item"><span class="slash-icon">H1</span> Heading 1</div>
-          <div class="slash-item hl"><span class="slash-icon">&Sigma;</span> Block Equation</div>
+          <div class="slash-item hl"><span class="slash-icon">&int; f</span> Block Equation</div>
           <div class="slash-item"><span class="slash-icon">=</span> Compute Field</div>
-          <div class="slash-item"><span class="slash-icon">~</span> Graph Plot</div>
-          <div class="slash-item"><span class="slash-icon">&lt;&gt;</span> Code Block</div>
+          <div class="slash-item"><span class="slash-icon">&fnof;(x)</span> Graph Plot</div>
+          <div class="slash-item"><span class="slash-icon">&lt;/&gt;</span> Code Block</div>
         </div>
-        <div class="bento-cell-title">Slash commands.</div>
+        <div class="bento-cell-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Slash commands.</div>
         <div class="bento-cell-desc">Type / to insert any block type.</div>
       </div>
 
@@ -1272,26 +1298,43 @@
           <div class="swatch" style="background:#2e3440" data-bg="#2e3440" data-text="#d8dee9"><span class="swatch-label" style="color:#b0b8c8">Nord</span></div>
           <div class="swatch" style="background:#080c08" data-bg="#080c08" data-text="#8fac8f"><span class="swatch-label" style="color:#6a9a6a">Green</span></div>
         </div>
-        <div class="bento-cell-title" id="theme-title">Six themes.</div>
+        <div class="bento-cell-title" id="theme-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Six themes.</div>
         <div class="bento-cell-desc" id="theme-desc">Zero accent colours. Click a swatch.</div>
       </div>
 
       <!-- Export -->
       <div class="bento-cell bento-export reveal">
-        <span class="bento-cell-label">.tex</span>
+        <span class="bento-cell-label">Export</span>
         <div class="bento-export-content">
-          <div class="export-code">
-            <code>\documentclass{article}</code>
-            <code>\usepackage{amsmath}</code>
-            <code>&nbsp;</code>
-            <code>\begin{document}</code>
-            <code>&nbsp; \begin{equation}</code>
-            <code>&nbsp;&nbsp;&nbsp; <span class="export-hl">x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</span></code>
-            <code>&nbsp; \end{equation}</code>
-            <code>\end{document}</code>
+          <div class="export-visual">
+            <div class="export-source">
+              \[\displaystyle \nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}\]
+            </div>
+            <div class="export-arrow-row">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              one click
+            </div>
+            <div class="export-formats">
+              <div class="export-format-pill">
+                <div class="export-format-ext">.tex</div>
+                <div class="export-format-name">LaTeX</div>
+              </div>
+              <div class="export-format-pill">
+                <div class="export-format-ext">.md</div>
+                <div class="export-format-name">Markdown</div>
+              </div>
+              <div class="export-format-pill">
+                <div class="export-format-ext">.html</div>
+                <div class="export-format-name">HTML</div>
+              </div>
+              <div class="export-format-pill">
+                <div class="export-format-ext">.pdf</div>
+                <div class="export-format-name">PDF</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="bento-cell-title">Export to LaTeX & Markdown.</div>
+        <div class="bento-cell-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export anywhere.</div>
         <div class="bento-cell-desc">One-click export handles equations, compute fields, and graphs.</div>
       </div>
 
@@ -1361,7 +1404,10 @@
 
   <!-- ═══ FOOTER ═══ -->
   <footer>
-    <span>Skrybbl &mdash; 2026. Open source under MIT.</span>
+    <span style="display:flex;align-items:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 500 500" fill="none"><g transform="matrix(2.51796,0,0,2.51796,-1563.66,-565.099)"><path d="M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z" fill="currentColor"/></g></svg>
+      Skrybbl &mdash; 2026. Open source under MIT.
+    </span>
     <div class="footer-links">
       <a href="https://github.com/username/skrybbl" target="_blank">GitHub</a>
       <a href="https://github.com/username/skrybbl/releases" target="_blank">Releases</a>
@@ -1517,7 +1563,104 @@
     });
   })();
 
-  // ── 5. KaTeX Auto-Render ────────────────────────────────
+  // ── 5. Hero Demo Cycling ────────────────────────────────
+  (function() {
+    const demoScenes = [
+      {
+        title: 'Physics I.skrybbl',
+        lines: [
+          { type: 'text', content: 'The displacement is given by' },
+          { type: 'math', content: '\\[\\displaystyle s = ut + \\tfrac{1}{2}at^2\\]' },
+          { type: 'compute', expr: '= 0.5 * 9.81 * 3^2', result: '44.15 m' }
+        ]
+      },
+      {
+        title: 'Quantum Mechanics.skrybbl',
+        lines: [
+          { type: 'text', content: 'The time-independent Schr\u00F6dinger equation:' },
+          { type: 'math', content: '\\[\\displaystyle -\\frac{\\hbar^2}{2m}\\nabla^2\\Psi + V\\Psi = E\\Psi\\]' },
+          { type: 'compute', expr: '= hbar^2 / (2 * 9.109e-31)', result: '6.12e-39 J\u00B7m\u00B2' }
+        ]
+      },
+      {
+        title: 'Linear Algebra.skrybbl',
+        lines: [
+          { type: 'text', content: 'Eigenvalue decomposition of a matrix:' },
+          { type: 'math', content: '\\[\\displaystyle A\\mathbf{v} = \\lambda\\mathbf{v} \\implies \\det(A - \\lambda I) = 0\\]' },
+          { type: 'compute', expr: '= det([3,1;0,2])', result: '6' }
+        ]
+      },
+      {
+        title: 'Thermodynamics.skrybbl',
+        lines: [
+          { type: 'text', content: 'The Boltzmann entropy formula:' },
+          { type: 'math', content: '\\[\\displaystyle S = k_B \\ln \\Omega\\]' },
+          { type: 'compute', expr: '= 1.381e-23 * ln(6.022e23)', result: '7.56e-22 J/K' }
+        ]
+      },
+      {
+        title: 'Calculus III.skrybbl',
+        lines: [
+          { type: 'text', content: 'Stokes\u2019 theorem relates a surface integral to a line integral:' },
+          { type: 'math', content: '\\[\\displaystyle \\oint_C \\mathbf{F}\\cdot d\\mathbf{r} = \\iint_S (\\nabla \\times \\mathbf{F})\\cdot d\\mathbf{S}\\]' },
+          { type: 'compute', expr: '= integrate(x^2, x, 0, 3)', result: '9' }
+        ]
+      }
+    ];
+
+    const body = document.getElementById('demo-body');
+    const titleEl = document.getElementById('demo-title');
+    let current = 0;
+
+    function buildLines(scene) {
+      return scene.lines.map(line => {
+        if (line.type === 'math') {
+          return '<div class="demo-line demo-math">' + line.content + '</div>';
+        } else if (line.type === 'compute') {
+          return '<div class="demo-line demo-compute">' + line.expr +
+            ' <span style="color:var(--text-faint)">&rarr;</span> <span class="demo-result">' +
+            line.result + '</span></div>';
+        } else {
+          return '<div class="demo-line">' + line.content + '<span class="demo-cursor"></span></div>';
+        }
+      }).join('');
+    }
+
+    function showScene(index) {
+      const scene = demoScenes[index];
+      titleEl.textContent = scene.title;
+      body.innerHTML = buildLines(scene);
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(body, {
+          delimiters: [
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      // Stagger reveal lines
+      const lines = body.querySelectorAll('.demo-line');
+      lines.forEach(function(line, i) {
+        setTimeout(function() { line.classList.add('show'); }, 200 + i * 400);
+      });
+    }
+
+    function cycle() {
+      body.classList.add('fading');
+      setTimeout(function() {
+        current = (current + 1) % demoScenes.length;
+        showScene(current);
+        body.classList.remove('fading');
+      }, 500);
+    }
+
+    // Initial scene
+    showScene(0);
+    setInterval(cycle, 5000);
+  })();
+
+  // ── 6. KaTeX Auto-Render ────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
     if (typeof renderMathInElement !== 'undefined') {
       renderMathInElement(document.body, {

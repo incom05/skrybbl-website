@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skrybbl — Documentation</title>
+  <meta name="description" content="Documentation for Skrybbl, the free open-source maths notebook for students." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='none'%3E%3Cg transform='matrix(2.51796,0,0,2.51796,-1563.66,-565.099)'%3E%3Cpath d='M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z' fill='%23d4d4d4'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #141414;
+      --text: #d4d4d4;
+      --text-dim: #999999;
+      --text-faint: #5a5a5a;
+      --text-ghost: #2a2a2a;
+      --border: rgba(255,255,255,0.09);
+      --border-strong: rgba(255,255,255,0.16);
+      --mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+    }
+
+    html {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    body { overflow-x: hidden; }
+
+    ::selection { background: rgba(255,255,255,0.12); color: #fff; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: #fff; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+    /* ── Nav ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 4vw, 60px);
+      height: 54px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      padding: 7px 16px;
+      border: 1px solid var(--border-strong);
+      color: var(--text) !important;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .nav-cta:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* ── Layout ──────────────────────────────────────────── */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding-top: 54px;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────── */
+    .docs-sidebar {
+      position: sticky;
+      top: 54px;
+      height: calc(100vh - 54px);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      padding: 32px 0 48px;
+    }
+
+    .docs-sidebar-section {
+      margin-bottom: 24px;
+    }
+
+    .docs-sidebar-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: 6px 20px;
+    }
+
+    .docs-sidebar a {
+      display: block;
+      padding: 4px 20px;
+      font-size: 12px;
+      color: var(--text-dim);
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .docs-sidebar a:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* ── Content ─────────────────────────────────────────── */
+    .docs-content {
+      padding: 48px clamp(24px, 4vw, 64px) 120px;
+      max-width: 780px;
+    }
+
+    .docs-content h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .docs-content .docs-subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    .docs-content h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-top: 56px;
+      margin-bottom: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .docs-content h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .docs-content h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 32px;
+      margin-bottom: 8px;
+    }
+
+    .docs-content p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .docs-content ul {
+      list-style: none;
+      margin-bottom: 16px;
+    }
+
+    .docs-content ul li {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .docs-content ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 4px;
+      height: 4px;
+      background: var(--text-faint);
+    }
+
+    .docs-content code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      color: #fff;
+    }
+
+    kbd {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .shortcut-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+    }
+
+    .shortcut-table td {
+      padding: 8px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .shortcut-table td:first-child {
+      color: var(--text-dim);
+      width: 55%;
+    }
+
+    .shortcut-table td:last-child {
+      text-align: right;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      margin: 12px 0;
+    }
+
+    .feature-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .feature-card-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .docs-content .math-example {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      margin: 12px 0;
+      text-align: centre;
+      color: #fff;
+    }
+
+    .docs-content .math-example .katex { font-size: 1.2em; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px clamp(24px, 6vw, 100px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--text); }
+
+    .footer-links { display: flex; gap: 24px; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .docs-layout {
+        grid-template-columns: 1fr;
+      }
+      .docs-sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 20px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <svg width="20" height="20" viewBox="0 0 500 500" fill="none">
+        <g transform="matrix(2.51796,0,0,2.51796,-1563.66,-565.099)">
+          <path d="M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z" fill="#d4d4d4"/>
+        </g>
+      </svg>
+      Skrybbl
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/username/skrybbl" target="_blank">GitHub</a>
+      <a href="index.html#download" class="nav-cta">Download</a>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+
+    <aside class="docs-sidebar">
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <a href="#overview">Overview</a>
+        <a href="#installation">Installation</a>
+        <a href="#notebooks">Notebooks &amp; Pages</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Editor</div>
+        <a href="#formatting">Text Formatting</a>
+        <a href="#slash-commands">Slash Commands</a>
+        <a href="#context-menu">Context Menu</a>
+        <a href="#links">Links</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Maths &amp; Science</div>
+        <a href="#inline-maths">Inline Maths</a>
+        <a href="#block-maths">Block Equations</a>
+        <a href="#equation-refs">Equation References</a>
+        <a href="#compute">Live Computation</a>
+        <a href="#symbolic">Symbolic Algebra</a>
+        <a href="#graphs">Graph Plotting</a>
+        <a href="#diagrams">Diagrams</a>
+        <a href="#handwriting">Handwriting Recognition</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Features</div>
+        <a href="#code-blocks">Code Blocks</a>
+        <a href="#images">Images</a>
+        <a href="#find-replace">Find &amp; Replace</a>
+        <a href="#command-palette">Command Palette</a>
+        <a href="#focus-mode">Focus Mode</a>
+        <a href="#tabs">Tabs</a>
+        <a href="#version-history">Version History</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Appearance</div>
+        <a href="#themes">Themes</a>
+        <a href="#fonts">Editor Fonts</a>
+        <a href="#spellcheck">Spellcheck</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Export</div>
+        <a href="#export-latex">LaTeX</a>
+        <a href="#export-markdown">Markdown</a>
+        <a href="#export-html">HTML</a>
+        <a href="#export-pdf">PDF</a>
+      </div>
+      <div class="docs-sidebar-section">
+        <div class="docs-sidebar-title">Reference</div>
+        <a href="#shortcuts">All Keyboard Shortcuts</a>
+        <a href="#file-format">File Format</a>
+      </div>
+    </aside>
+
+    <main class="docs-content">
+
+      <h1>Documentation</h1>
+      <p class="docs-subtitle">
+        Everything you need to know about using Skrybbl &mdash; the free, open-source
+        maths notebook for students.
+      </p>
+
+
+      <!-- ─── GETTING STARTED ─────────────────────────── -->
+
+      <h2 id="overview">Overview</h2>
+      <p>
+        Skrybbl is a desktop notebook application built for maths, physics, and engineering students.
+        It provides WYSIWYG equation editing, live computation, graph plotting, symbolic algebra,
+        and diagram support &mdash; all in a distraction-free interface with no internet requirement.
+      </p>
+      <p>
+        Documents are saved as <code>.skrybbl</code> files (JSON format) and can be exported to
+        LaTeX, Markdown, HTML, or PDF at any time.
+      </p>
+
+      <h2 id="installation">Installation</h2>
+      <p>
+        Download the latest <code>Skrybbl-Setup.exe</code> from the
+        <a href="https://github.com/username/skrybbl/releases">releases page</a>.
+        Run the installer &mdash; no sign-in or account is required. The app works entirely offline.
+      </p>
+      <p>
+        Requirements: Windows 10 or later. Approximately 85 MB of disc space.
+      </p>
+
+      <h2 id="notebooks">Notebooks &amp; Pages</h2>
+      <p>
+        Each notebook contains one or more <strong>pages</strong>. Use the sidebar to navigate
+        between pages, add new ones, rename, reorder (drag and drop), or delete them.
+      </p>
+      <p>
+        The notebook title and page titles are both editable. Changes are auto-saved after
+        2 seconds of inactivity whenever the notebook has a file path.
+      </p>
+
+
+      <!-- ─── EDITOR ─────────────────────────────────── -->
+
+      <h2 id="formatting">Text Formatting</h2>
+      <p>
+        The editor supports standard rich-text formatting through keyboard shortcuts and the toolbar:
+      </p>
+      <table class="shortcut-table">
+        <tr><td>Bold</td><td><kbd>Ctrl</kbd> <kbd>B</kbd></td></tr>
+        <tr><td>Italic</td><td><kbd>Ctrl</kbd> <kbd>I</kbd></td></tr>
+        <tr><td>Underline</td><td><kbd>Ctrl</kbd> <kbd>U</kbd></td></tr>
+        <tr><td>Strikethrough</td><td>Toolbar or context menu</td></tr>
+        <tr><td>Inline code</td><td>Toolbar or context menu</td></tr>
+        <tr><td>Subscript / Superscript</td><td>Toolbar</td></tr>
+      </table>
+      <p>
+        Block-level elements include three heading levels, bullet lists, ordered lists,
+        blockquotes, code blocks, and horizontal rules.
+      </p>
+
+      <h2 id="slash-commands">Slash Commands</h2>
+      <p>
+        Type <code>/</code> anywhere in the editor to open the slash menu. Start typing to filter.
+        Available commands:
+      </p>
+      <ul>
+        <li><strong>Heading 1 / 2 / 3</strong> &mdash; Insert headings</li>
+        <li><strong>Bullet List</strong> &mdash; Unordered list</li>
+        <li><strong>Ordered List</strong> &mdash; Numbered list</li>
+        <li><strong>Quote</strong> &mdash; Blockquote</li>
+        <li><strong>Code Block</strong> &mdash; Syntax-highlighted code</li>
+        <li><strong>Divider</strong> &mdash; Horizontal rule</li>
+        <li><strong>Inline Math</strong> &mdash; Inline equation</li>
+        <li><strong>Block Math</strong> &mdash; Display equation</li>
+        <li><strong>Compute</strong> &mdash; Live computation field</li>
+        <li><strong>Image</strong> &mdash; Insert image from file picker</li>
+        <li><strong>Graph</strong> &mdash; Function graph plot</li>
+      </ul>
+
+      <h2 id="context-menu">Context Menu</h2>
+      <p>
+        Right-click in the editor for a context menu with formatting, insertion, link, and
+        clipboard actions. The available options adapt to your current selection.
+      </p>
+
+      <h2 id="links">Links</h2>
+      <p>
+        Select text and press <kbd>Ctrl</kbd> <kbd>L</kbd> to insert a hyperlink.
+        A bubble popup appears where you can type or paste a URL. Click "Apply" or press Enter
+        to confirm. To remove a link, click "Remove" in the bubble, or use the context menu.
+      </p>
+
+
+      <!-- ─── MATHS & SCIENCE ────────────────────────── -->
+
+      <h2 id="inline-maths">Inline Maths</h2>
+      <p>
+        Insert inline equations that flow within your text. There are three ways to create them:
+      </p>
+      <ul>
+        <li>Press <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>E</kbd></li>
+        <li>Type <code>/</code> and select "Inline Math"</li>
+        <li>Type <code>$...$</code> &mdash; wrapping any text in dollar signs automatically converts it to an inline equation</li>
+      </ul>
+      <p>
+        Inline maths are rendered with MathLive, providing a WYSIWYG LaTeX editing experience.
+        Click on any equation to edit its LaTeX source.
+      </p>
+
+      <h2 id="block-maths">Block Equations</h2>
+      <p>
+        Display equations are centred, full-width blocks. Create them by:
+      </p>
+      <ul>
+        <li>Press <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>M</kbd></li>
+        <li>Type <code>/</code> and select "Block Math"</li>
+        <li>Type <code>$$</code> at the start of a line</li>
+      </ul>
+      <p>
+        Block equations support optional <strong>numbering</strong> and <strong>labels</strong>.
+        When numbered, they can be cross-referenced elsewhere in the document using equation references.
+      </p>
+
+      <h2 id="equation-refs">Equation References</h2>
+      <p>
+        Reference a numbered equation by its label. When the document is exported, these references
+        resolve to the correct equation number, just like <code>\ref{}</code> in LaTeX.
+      </p>
+
+      <h2 id="compute">Live Computation</h2>
+      <p>
+        Compute fields evaluate mathematical expressions in real time using
+        <a href="https://mathjs.org" target="_blank">math.js</a>. Create one by:
+      </p>
+      <ul>
+        <li>Press <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>=</kbd></li>
+        <li>Type <code>= </code> (equals followed by a space) at the start of a line</li>
+        <li>Type <code>/</code> and select "Compute"</li>
+      </ul>
+      <p>
+        Type any expression and the result appears instantly. Supported:
+        arithmetic, trigonometric functions, logarithms, square roots, matrix operations
+        (e.g. <code>det([1,2;3,4])</code>), unit conversions, and more.
+      </p>
+
+      <h2 id="symbolic">Symbolic Algebra</h2>
+      <p>
+        Symbolic blocks let you perform algebraic operations on expressions using
+        <a href="https://nerdamer.com" target="_blank">Nerdamer</a>. Available operations:
+      </p>
+      <ul>
+        <li><strong>Simplify</strong> &mdash; Reduce an expression to simplest form</li>
+        <li><strong>Expand</strong> &mdash; Expand products and powers</li>
+        <li><strong>Factor</strong> &mdash; Factorise an expression</li>
+        <li><strong>Solve</strong> &mdash; Solve for a variable</li>
+        <li><strong>Differentiate</strong> &mdash; Symbolic differentiation</li>
+        <li><strong>Integrate</strong> &mdash; Symbolic integration</li>
+      </ul>
+      <p>
+        Each operation takes an expression and an optional variable (defaults to <code>x</code>).
+      </p>
+
+      <h2 id="graphs">Graph Plotting</h2>
+      <p>
+        Plot mathematical functions inline in your notebook. Insert a graph via the slash menu
+        (<code>/graph</code>). Each graph supports:
+      </p>
+      <ul>
+        <li>Multiple functions with solid or dashed line styles</li>
+        <li>Configurable x and y domain ranges</li>
+        <li>Optional grid lines</li>
+        <li>Optional title</li>
+        <li>Adjustable width and height</li>
+      </ul>
+      <p>
+        Graphs are rendered using function-plot (built on d3.js) and are included as SVGs
+        in HTML exports.
+      </p>
+
+      <h2 id="diagrams">Diagrams</h2>
+      <p>
+        Create diagrams using <a href="https://mermaid.js.org" target="_blank">Mermaid</a> syntax.
+        Type your diagram code and it renders as an SVG preview. Supports flowcharts,
+        sequence diagrams, state diagrams, Gantt charts, and more.
+      </p>
+
+      <h2 id="handwriting">Handwriting Recognition</h2>
+      <p>
+        Draw maths equations by hand and convert them to LaTeX using MyScript iink.
+        This feature requires a free API key from
+        <a href="https://developer.myscript.com" target="_blank">developer.myscript.com</a>
+        (2,000 free recognitions per month).
+      </p>
+      <p>
+        Configure your keys in <strong>Settings</strong> (gear icon in the toolbar).
+        Once connected, use the handwriting overlay to draw and insert equations.
+      </p>
+
+
+      <!-- ─── FEATURES ───────────────────────────────── -->
+
+      <h2 id="code-blocks">Code Blocks</h2>
+      <p>
+        Insert syntax-highlighted code blocks via the slash menu or toolbar. Supports all common
+        languages through <a href="https://highlightjs.org" target="_blank">highlight.js</a> (lowlight).
+        <kbd>Tab</kbd> inserts two spaces, <kbd>Shift</kbd> <kbd>Tab</kbd> removes leading indentation.
+      </p>
+
+      <h2 id="images">Images</h2>
+      <p>
+        Insert images three ways:
+      </p>
+      <ul>
+        <li>Slash menu: <code>/image</code> opens a file picker</li>
+        <li>Paste an image from the clipboard</li>
+        <li>Drag and drop an image file into the editor</li>
+      </ul>
+      <p>
+        Images are stored as base64 within the notebook file. You can resize images
+        by adjusting the width attribute.
+      </p>
+
+      <h2 id="find-replace">Find &amp; Replace</h2>
+      <p>
+        Press <kbd>Ctrl</kbd> <kbd>F</kbd> to open the find bar. Type to search &mdash; all matches
+        are highlighted in the document with the active match emphasised.
+      </p>
+      <ul>
+        <li><kbd>Enter</kbd> &mdash; Next match</li>
+        <li><kbd>Shift</kbd> <kbd>Enter</kbd> &mdash; Previous match</li>
+        <li>Click the expand arrow to reveal replace controls</li>
+        <li><strong>Replace</strong> &mdash; Replace current match</li>
+        <li><strong>All</strong> &mdash; Replace all matches at once</li>
+      </ul>
+
+      <h2 id="command-palette">Command Palette</h2>
+      <p>
+        Press <kbd>Ctrl</kbd> <kbd>K</kbd> to open the command palette. Search through all
+        available commands by name, category, or keyword. Navigate with arrow keys, execute with
+        Enter, close with Escape.
+      </p>
+      <p>
+        Commands are organised into categories: File, Edit, Insert, View, Export, and Theme.
+      </p>
+
+      <h2 id="focus-mode">Focus Mode</h2>
+      <p>
+        Press <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>F</kbd> to toggle focus mode. This hides
+        the sidebar and provides a distraction-free writing environment.
+      </p>
+
+      <h2 id="tabs">Tabs</h2>
+      <p>
+        Open multiple notebooks simultaneously using tabs. Each tab maintains its own notebook,
+        file path, and dirty state independently. If you open a file that is already open in
+        another tab, Skrybbl switches to that tab instead of creating a duplicate.
+      </p>
+      <p>
+        Tabs can be reordered by dragging. Close a tab by clicking its close button &mdash; if
+        it is the last tab, a fresh empty notebook replaces it.
+      </p>
+
+      <h2 id="version-history">Version History</h2>
+      <p>
+        Skrybbl automatically creates snapshots on every auto-save. You can also create snapshots
+        manually. Open the version history panel to browse, select, and restore any previous
+        snapshot. Up to 50 snapshots are retained per notebook.
+      </p>
+
+
+      <!-- ─── APPEARANCE ─────────────────────────────── -->
+
+      <h2 id="themes">Themes</h2>
+      <p>
+        Six built-in themes with no accent colours &mdash; just clean typography against
+        carefully chosen backgrounds:
+      </p>
+      <ul>
+        <li><strong>Dark</strong> &mdash; Deep black (#0a0a0a)</li>
+        <li><strong>Light</strong> &mdash; Near white (#fafafa)</li>
+        <li><strong>Midnight</strong> &mdash; Blue-tinted dark (#0b0d14)</li>
+        <li><strong>Paper</strong> &mdash; Warm sepia (#f5f0e8)</li>
+        <li><strong>Nord</strong> &mdash; Polar night (#2e3440)</li>
+        <li><strong>Green</strong> &mdash; Terminal green (#080c08)</li>
+      </ul>
+      <p>
+        Cycle through themes using the toolbar button or the command palette. Your choice
+        persists across sessions via local storage.
+      </p>
+
+      <h2 id="fonts">Editor Fonts</h2>
+      <p>
+        Three editor font options: <strong>Mono</strong> (default), <strong>Sans</strong>,
+        and <strong>Serif</strong>. Click the font button in the toolbar to cycle, or set
+        it from the command palette. Your preference is saved.
+      </p>
+
+      <h2 id="spellcheck">Spellcheck</h2>
+      <p>
+        Browser-native spellchecking is enabled by default. Toggle it via the command palette
+        or settings. The setting persists across sessions.
+      </p>
+
+
+      <!-- ─── EXPORT ─────────────────────────────────── -->
+
+      <h2 id="export-latex">Export to LaTeX</h2>
+      <p>
+        File &rarr; Export as LaTeX generates a complete <code>.tex</code> document with:
+      </p>
+      <ul>
+        <li>Proper <code>\documentclass</code>, <code>amsmath</code>, and <code>amssymb</code> packages</li>
+        <li>Pages as <code>\section*{}</code> blocks</li>
+        <li>Inline maths as <code>$...$</code>, block equations as <code>\[...\]</code> or numbered <code>equation</code> environments</li>
+        <li>Compute fields as <code>expression = result</code> text</li>
+        <li>Lists, blockquotes, code blocks, and formatting marks correctly converted</li>
+      </ul>
+
+      <h2 id="export-markdown">Export to Markdown</h2>
+      <p>
+        Exports a <code>.md</code> file with standard Markdown syntax. Maths are represented
+        using dollar-sign delimiters (<code>$...$</code> and <code>$$...$$</code>), compatible
+        with most Markdown renderers that support LaTeX (GitHub, Obsidian, Notion, etc.).
+      </p>
+
+      <h2 id="export-html">Export to HTML</h2>
+      <p>
+        Generates a self-contained HTML file with embedded KaTeX for maths rendering and
+        highlight.js for code syntax highlighting. Supports light/dark mode via
+        <code>prefers-color-scheme</code>. Graph plots are included as inline SVGs.
+      </p>
+
+      <h2 id="export-pdf">Export to PDF</h2>
+      <p>
+        Exports via the HTML pipeline, then uses Electron's built-in print-to-PDF.
+        The result is a nicely formatted document with rendered equations and graphs.
+      </p>
+
+
+      <!-- ─── REFERENCE ──────────────────────────────── -->
+
+      <h2 id="shortcuts">All Keyboard Shortcuts</h2>
+
+      <h3>File</h3>
+      <table class="shortcut-table">
+        <tr><td>Open notebook</td><td><kbd>Ctrl</kbd> <kbd>O</kbd></td></tr>
+        <tr><td>Save</td><td><kbd>Ctrl</kbd> <kbd>S</kbd></td></tr>
+        <tr><td>Save as</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>S</kbd></td></tr>
+      </table>
+
+      <h3>Formatting</h3>
+      <table class="shortcut-table">
+        <tr><td>Bold</td><td><kbd>Ctrl</kbd> <kbd>B</kbd></td></tr>
+        <tr><td>Italic</td><td><kbd>Ctrl</kbd> <kbd>I</kbd></td></tr>
+        <tr><td>Underline</td><td><kbd>Ctrl</kbd> <kbd>U</kbd></td></tr>
+        <tr><td>Undo</td><td><kbd>Ctrl</kbd> <kbd>Z</kbd></td></tr>
+        <tr><td>Redo</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></td></tr>
+      </table>
+
+      <h3>Maths &amp; Insertion</h3>
+      <table class="shortcut-table">
+        <tr><td>Inline maths</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>E</kbd></td></tr>
+        <tr><td>Block equation</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>M</kbd></td></tr>
+        <tr><td>Compute field</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>=</kbd></td></tr>
+        <tr><td>Inline maths (input rule)</td><td><code>$...$</code></td></tr>
+        <tr><td>Block equation (input rule)</td><td><code>$$</code></td></tr>
+        <tr><td>Compute field (input rule)</td><td><code>= </code> (at line start)</td></tr>
+        <tr><td>Slash commands</td><td><code>/</code></td></tr>
+        <tr><td>Link</td><td><kbd>Ctrl</kbd> <kbd>L</kbd></td></tr>
+      </table>
+
+      <h3>View &amp; Navigation</h3>
+      <table class="shortcut-table">
+        <tr><td>Command palette</td><td><kbd>Ctrl</kbd> <kbd>K</kbd></td></tr>
+        <tr><td>Toggle sidebar</td><td><kbd>Ctrl</kbd> <kbd>\</kbd></td></tr>
+        <tr><td>Focus mode</td><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>F</kbd></td></tr>
+        <tr><td>Find &amp; replace</td><td><kbd>Ctrl</kbd> <kbd>F</kbd></td></tr>
+        <tr><td>Keyboard shortcuts overlay</td><td><kbd>Ctrl</kbd> <kbd>/</kbd></td></tr>
+      </table>
+
+      <h2 id="file-format">File Format</h2>
+      <p>
+        <code>.skrybbl</code> files are JSON documents with the following structure:
+      </p>
+      <ul>
+        <li><code>version</code> &mdash; Schema version (currently 1)</li>
+        <li><code>title</code> &mdash; Notebook title</li>
+        <li><code>pages</code> &mdash; Array of page objects, each containing an <code>id</code>, <code>title</code>, <code>content</code> (TipTap JSON), and timestamps</li>
+        <li><code>activePageId</code> &mdash; Currently selected page</li>
+        <li><code>snapshots</code> &mdash; Optional array of version history snapshots (up to 50)</li>
+        <li><code>createdAt</code> / <code>updatedAt</code> &mdash; ISO timestamps</li>
+      </ul>
+      <p>
+        The content field uses the <a href="https://tiptap.dev" target="_blank">TipTap</a>
+        (ProseMirror) JSON format, making it straightforward to parse or transform programmatically.
+      </p>
+
+    </main>
+  </div>
+
+  <footer>
+    <span style="display:flex;align-items:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 500 500" fill="none"><g transform="matrix(2.51796,0,0,2.51796,-1563.66,-565.099)"><path d="M819.573,275.836L786.08,292.384L819.573,342.027L764.944,423L655.684,423L621,371.591L654.493,355.043L621,305.399L675.63,224.427L784.889,224.427L819.573,275.836ZM692.436,256.04L659.135,305.399L700.469,366.665L700.187,367.727L667.443,383.905L672.491,391.387L748.137,391.387L781.438,342.027L740.104,280.761L740.386,279.7L773.13,263.522L768.082,256.04L692.436,256.04Z" fill="currentColor"/></g></svg>
+      Skrybbl &mdash; 2026. Open source under MIT.
+    </span>
+    <div class="footer-links">
+      <a href="https://github.com/username/skrybbl" target="_blank">GitHub</a>
+      <a href="https://github.com/username/skrybbl/releases" target="_blank">Releases</a>
+      <a href="https://github.com/username/skrybbl/issues" target="_blank">Report Issue</a>
+    </div>
+  </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof renderMathInElement !== 'undefined') {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
